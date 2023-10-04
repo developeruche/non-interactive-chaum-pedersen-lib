@@ -1,7 +1,7 @@
 use std::fmt::format;
 use num::One;
 use num_bigint::BigUint;
-use crate::utils::hash_str;
+use crate::utils::{exponentiate, hash_str};
 
 pub mod utils;
 
@@ -54,12 +54,26 @@ pub fn verify_challenge(
     solution: &BigUint,
     challenge_in: &BigUint,
     y_one: &BigUint,
-    y_two: &BigUint
+    y_two: &BigUint,
+    prime: &BigUint
 ) -> bool {
-    // let gen_r_one
-    // let gen_r_2
-    // let gen_challenge
+    let alpha_expo_s = exponentiate(alpha, solution, prime);
+    let y_one_exp_c = exponentiate(y_one, challenge_in, prime);
+    let alpha_e_s_multi_y_one_expo_c = alpha_expo_s * y_one_exp_c;
+    let gen_r_one =  exponentiate(&alpha_e_s_multi_y_one_expo_c, &BigUint::one(), prime);
+
+    let beta_expo_s = exponentiate(beta, solution, prime);
+    let y_two_expo_c = exponentiate(y_two, challenge_in, prime);
+    let beta_e_s_multi_y_two_expo_c = beta_expo_s * y_two_expo_c;
+    let gen_r_two = exponentiate(&beta_e_s_multi_y_two_expo_c, &BigUint::one(), prime);
+
+    let gen_challenge_res =  gen_challenge(
+        y_one,
+        y_two,
+        &gen_r_one,
+        &gen_r_two
+    );
 
 
-     // return condition
+    *challenge_in == gen_challenge_res
 }
