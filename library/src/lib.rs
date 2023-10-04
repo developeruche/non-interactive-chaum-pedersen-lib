@@ -67,6 +67,7 @@ pub fn verify_challenge(
     let beta_e_s_multi_y_two_expo_c = beta_expo_s * y_two_expo_c;
     let gen_r_two = exponentiate(&beta_e_s_multi_y_two_expo_c, &BigUint::one(), prime);
 
+    println!("this is the generated {} - {}", gen_r_one, gen_r_two);
     let gen_challenge_res =  gen_challenge(
         y_one,
         y_two,
@@ -75,5 +76,98 @@ pub fn verify_challenge(
     );
 
 
+    println!("{} - {} this is the c in and out", challenge_in, gen_challenge_res);
+
+
     *challenge_in == gen_challenge_res
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_solve_challenge_one() {
+        let k = BigUint::from(10u32);
+        let x = BigUint::from(3u32);
+        let c = BigUint::from(3u32);
+        let p = BigUint::from(10u32);
+
+
+        let solution = solve_challenge(
+            &k,
+            &x,
+            &c,
+            &p
+        );
+
+
+        assert_eq!(solution, BigUint::one());
+    }
+
+    #[test]
+    fn test_solve_challenge_two() {
+        // testing negative
+        let x = BigUint::from(4u32);
+        let c = BigUint::from(3u32);
+        let k = BigUint::from(10u32);
+        let p = BigUint::from(10u32);
+
+        let solution = solve_challenge(
+            &k,
+            &x,
+            &c,
+            &p
+        );
+
+
+        assert_eq!(solution, BigUint::from(8u32));
+    }
+
+
+
+    #[test]
+    fn test_the_toy_example() {
+        let p = BigUint::from(10009u32);
+        let q = (&p - BigUint::one()) / BigUint::from(2u32);
+
+        let x = BigUint::from(300u32);
+        let g = BigUint::from(3u32);
+        let h = BigUint::from(2892u32);
+
+        let y1 = exponentiate(&g, &x, &p);
+        let y2 = exponentiate(&h, &x, &p);
+
+        let k = BigUint::from(10u32);
+
+        let r1 = exponentiate(&g, &k, &p);
+        let r2 = exponentiate(&h, &k, &p);
+
+        let c = gen_challenge(
+            &y1,
+            &y2,
+            &r1,
+            &r2
+        );
+
+        let s = solve_challenge(&k, &x, &c, &q);
+
+        println!("this is the input {} - {} ", r1, r2);
+
+
+        let verification = verify_challenge(&g, &h, &s, &c, &y1, &y2, &p);
+        assert!(verification)
+    }
 }
