@@ -1,6 +1,6 @@
 use std::fmt::format;
 use num::One;
-use num_bigint::BigUint;
+pub use num_bigint::BigUint;
 use crate::utils::{exponentiate, hash_str};
 
 pub mod utils;
@@ -14,6 +14,18 @@ pub struct NICP {
     pub beta: BigUint,
     pub modulus: BigUint,
     pub order: BigUint
+}
+
+
+impl NICP {
+    pub fn new() -> NICP {
+        NICP {
+            alpha: BigUint::from(6u32),
+            beta: BigUint::from(2892u32),
+            modulus: BigUint::from(10009u32),
+            order: BigUint::from(5004u32)
+        }
+    }
 }
 
 
